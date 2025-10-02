@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/arc_data.dart';
 import '../utils/storage_helper.dart';
+import 'home_dashboard.dart';
 
 class ArcSetupPage extends StatefulWidget {
   const ArcSetupPage({super.key});
@@ -100,14 +101,12 @@ class _ArcSetupPageState extends State<ArcSetupPage> {
     // Save to storage
     await StorageHelper.saveArcData(arcData);
 
-    // Navigate to Home Dashboard (placeholder for now)
+    // Navigate to Home Dashboard
     if (mounted) {
-      _showMessage('Arc created successfully! 🎯');
-      // TODO: Navigate to Home Dashboard
-      // Navigator.pushReplacement(
-      //   context,
-      //   MaterialPageRoute(builder: (context) => const HomeDashboard()),
-      // );
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HomeDashboard()),
+      );
     }
   }
 

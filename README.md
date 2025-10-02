@@ -20,6 +20,24 @@ A productivity and self-growth app built with Flutter to help users track their 
 - Real-time goal counter (3-5 goals required)
 - Persistent storage for arc configuration
 
+#### 2. Home Dashboard (Daily Tracking)
+- **Arc Header**: Displays arc name and current day progress (e.g., "Day 18 of 75")
+- **Dual Progress Rings**: 
+  - Outer ring: Overall arc progress (days completed)
+  - Inner ring: Daily goals completion percentage
+- **Daily Goals Checklist**: Interactive task list with checkboxes
+- **Motivational Quotes**: Daily rotating inspirational messages
+- **Bottom Navigation**: Quick access to Home, Progress, Journal, and Profile
+
+**Key Features:**
+- Beautiful custom-painted circular progress indicators
+- Real-time goal tracking with instant visual feedback
+- Automatic daily reset for goals
+- 30+ motivational quotes that rotate daily
+- Smooth animations and transitions
+- Completion celebration with visual cues
+- Persistent daily progress storage
+
 ## Getting Started
 
 ### Prerequisites
@@ -44,13 +62,16 @@ flutter run
 
 ```
 lib/
-├── main.dart                 # App entry point
+├── main.dart                    # App entry point with routing logic
 ├── models/
-│   └── arc_data.dart        # Arc data model
+│   ├── arc_data.dart           # Arc data model with progress calculations
+│   └── daily_progress.dart     # Daily goal tracking model
 ├── pages/
-│   └── arc_setup_page.dart  # Onboarding page
+│   ├── arc_setup_page.dart     # Onboarding/setup page
+│   └── home_dashboard.dart     # Main daily tracking dashboard
 └── utils/
-    └── storage_helper.dart  # Local storage utilities
+    ├── storage_helper.dart     # Local storage utilities
+    └── quotes_helper.dart      # Motivational quotes manager
 ```
 
 ## Tech Stack
@@ -70,15 +91,15 @@ lib/
 ## Development Progress
 
 - [x] Arc Setup (Onboarding) Page
-- [ ] Home Dashboard
-- [ ] Challenge Progress
+- [x] Home Dashboard (Daily Tracking)
+- [ ] Challenge Progress (Stats & Streaks)
 - [ ] Task Planner
 - [ ] Study Tracker
 - [ ] Health & Fitness
-- [ ] Journal
+- [ ] Journal (Reflections & Notes)
 - [ ] Profile
 - [ ] Settings
 
 ## Next Steps
 
-Waiting for page specifications for the Home Dashboard.
+Waiting for page specifications for Challenge Progress or other pages.
