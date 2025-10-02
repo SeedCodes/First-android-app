@@ -79,6 +79,31 @@ A productivity and self-growth app built with Flutter to help users track their 
 - Empty state for new users
 - Persistent storage of all entries
 
+#### 5. Profile / Settings (Customization & Control)
+- **Arc Information**: Display current arc name, duration, and current day with editing options
+- **Arc Management**:
+  - Edit Arc Name (rename your arc)
+  - Edit Goals (add, remove, or modify goals with 3-5 limit enforcement)
+  - Restart Arc (complete reset with confirmation dialog)
+- **Theme Selection**: Choose from 3 themes (Default Dark, Minimal, Warrior)
+- **Notifications Settings**:
+  - Toggle daily reminders on/off
+  - Set custom notification time (time picker)
+  - Choose motivational style (Short Tips, Quotes, Custom)
+- **About Section**: App info, version, platform, and credits
+
+**Key Features:**
+- Live arc editing without losing progress
+- Dedicated Edit Goals page with drag indicators
+- Confirmation dialogs for destructive actions
+- Theme selection (structure ready for implementation)
+- Time picker for notification customization
+- Multiple motivational style options
+- Settings persistence across sessions
+- Reload arc data when returning from profile
+- Clean info chips showing days completed and remaining
+- Color-coded sections (blue, purple, green themes)
+
 ## Getting Started
 
 ### Prerequisites
@@ -108,12 +133,14 @@ lib/
 │   ├── arc_data.dart           # Arc data model with progress calculations
 │   ├── daily_progress.dart     # Daily goal tracking model
 │   ├── progress_stats.dart     # Streak and stats tracking model
-│   └── journal_entry.dart      # Journal entry model
+│   ├── journal_entry.dart      # Journal entry model
+│   └── app_settings.dart       # App settings and preferences model
 ├── pages/
 │   ├── arc_setup_page.dart     # Onboarding/setup page
 │   ├── home_dashboard.dart     # Main daily tracking dashboard
 │   ├── progress_page.dart      # Progress tracking and analytics
-│   └── journal_page.dart       # Personal reflection and journaling
+│   ├── journal_page.dart       # Personal reflection and journaling
+│   └── profile_page.dart       # Settings and arc management (includes EditGoalsPage)
 └── utils/
     ├── storage_helper.dart     # Local storage utilities
     └── quotes_helper.dart      # Motivational quotes manager
@@ -135,16 +162,29 @@ lib/
 
 ## Development Progress
 
+### Core Pages (Complete ✅)
 - [x] Arc Setup (Onboarding) Page
 - [x] Home Dashboard (Daily Tracking)
 - [x] Progress Tracking (Stats & Streaks)
 - [x] Journal (Reflections & Notes)
+- [x] Profile / Settings
+
+### Additional Features (Optional)
 - [ ] Task Planner
 - [ ] Study Tracker
-- [ ] Health & Fitness
-- [ ] Profile
-- [ ] Settings
+- [ ] Health & Fitness Tracker
+- [ ] Advanced Analytics
+- [ ] Social Features / Leaderboards
 
-## Next Steps
+## App Status
 
-Ready for the next page! Waiting for specifications for Task Planner, Study Tracker, Health & Fitness, or Profile pages.
+**🎉 Core App Complete!** 
+
+All 5 essential pages are fully implemented and functional:
+1. ✅ Onboarding with arc setup
+2. ✅ Daily goal tracking dashboard
+3. ✅ Progress stats and streaks
+4. ✅ Personal journaling
+5. ✅ Settings and customization
+
+The app is now a complete, functional Winter Arc companion ready for testing and deployment!

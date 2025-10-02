@@ -7,6 +7,7 @@ import '../utils/storage_helper.dart';
 import '../utils/quotes_helper.dart';
 import 'progress_page.dart';
 import 'journal_page.dart';
+import 'profile_page.dart';
 
 class HomeDashboard extends StatefulWidget {
   const HomeDashboard({super.key});
@@ -490,6 +491,18 @@ class _HomeDashboardState extends State<HomeDashboard> {
             setState(() {
               _currentNavIndex = 0;
             });
+          });
+        } else if (index == 3) {
+          // Profile page
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const ProfilePage()),
+          ).then((_) {
+            // Reset selection and reload data when returning
+            setState(() {
+              _currentNavIndex = 0;
+            });
+            _loadData(); // Reload in case arc info was edited
           });
         } else if (index != 0) {
           ScaffoldMessenger.of(context).showSnackBar(

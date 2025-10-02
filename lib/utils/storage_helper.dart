@@ -4,12 +4,14 @@ import '../models/arc_data.dart';
 import '../models/daily_progress.dart';
 import '../models/progress_stats.dart';
 import '../models/journal_entry.dart';
+import '../models/app_settings.dart';
 
 class StorageHelper {
   static const String _arcDataKey = 'arc_data';
   static const String _dailyProgressKey = 'daily_progress';
   static const String _progressStatsKey = 'progress_stats';
   static const String _journalEntriesKey = 'journal_entries';
+  static const String _appSettingsKey = 'app_settings';
 
   // Save arc data
   static Future<void> saveArcData(ArcData arcData) async {
@@ -129,5 +131,31 @@ class StorageHelper {
   static Future<void> clearJournalEntries() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_journalEntriesKey);
+  }
+
+  // Save app settings
+  static Future<void> saveAppSettings(AppSettings settings) async {
+    final prefs = await SharedPreferences.getInstance();
+    final jsonString = jsonEncode(settings.toJson());
+    await prefs.setString(_appSettingsKey, jsonString);
+  }
+
+  // Load app settings
+  static Future<AppSettings?> loadAppSettings() async {
+    final prefs = await SharedPreferences.getInstance();
+    final jsonString = prefs.getString(_appSettingsKey);
+    
+    if (jsonString == null) {
+      return null;
+    }
+
+    final jsonData = jsonDecode(jsonString) as Map<String, dynamic>;
+    return AppSettings.fromJson(jsonData);
+  }
+
+  // Clear app settings
+  static Future<void> clearAppSettings() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_appSettingsKey);
   }
 }
