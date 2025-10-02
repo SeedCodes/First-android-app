@@ -3,11 +3,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/arc_data.dart';
 import '../models/daily_progress.dart';
 import '../models/progress_stats.dart';
+import '../models/journal_entry.dart';
 
 class StorageHelper {
   static const String _arcDataKey = 'arc_data';
   static const String _dailyProgressKey = 'daily_progress';
   static const String _progressStatsKey = 'progress_stats';
+  static const String _journalEntriesKey = 'journal_entries';
 
   // Save arc data
   static Future<void> saveArcData(ArcData arcData) async {
@@ -98,5 +100,34 @@ class StorageHelper {
   static Future<void> clearProgressStats() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_progressStatsKey);
+  }
+
+  // Save journal entries
+  static Future<void> saveJournalEntries(List<JournalEntry> entries) async {
+    final prefs = await SharedPreferences.getInstance();
+    final jsonList = entries.map((entry) => entry.toJson()).toList();
+    final jsonString = jsonEncode(jsonList);
+    await prefs.setString(_journalEntriesKey, jsonString);
+  }
+
+  // Load journal entries
+  static Future<List<JournalEntry>> loadJournalEntries() async {
+    final prefs = await SharedPreferences.getInstance();
+    final jsonString = prefs.getString(_journalEntriesKey);
+    
+    if (jsonString == null) {
+      return [];
+    }
+
+    final jsonList = jsonDecode(jsonString) as List;
+    return jsonList
+        .map((json) => JournalEntry.fromJson(json as Map<String, dynamic>))
+        .toList();
+  }
+
+  // Clear journal entries
+  static Future<void> clearJournalEntries() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_journalEntriesKey);
   }
 }

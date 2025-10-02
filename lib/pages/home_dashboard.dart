@@ -6,6 +6,7 @@ import '../models/progress_stats.dart';
 import '../utils/storage_helper.dart';
 import '../utils/quotes_helper.dart';
 import 'progress_page.dart';
+import 'journal_page.dart';
 
 class HomeDashboard extends StatefulWidget {
   const HomeDashboard({super.key});
@@ -473,6 +474,17 @@ class _HomeDashboardState extends State<HomeDashboard> {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const ProgressPage()),
+          ).then((_) {
+            // Reset selection when returning
+            setState(() {
+              _currentNavIndex = 0;
+            });
+          });
+        } else if (index == 2) {
+          // Journal page
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const JournalPage()),
           ).then((_) {
             // Reset selection when returning
             setState(() {

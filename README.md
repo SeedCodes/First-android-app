@@ -60,6 +60,25 @@ A productivity and self-growth app built with Flutter to help users track their 
 - Success rate calculation
 - Complete journey overview with week rows
 
+#### 4. Journal / Reflection (Personal Log)
+- **Today's Entry**: Large text area for daily reflections with auto-save
+- **Mood Picker**: 5 emoji options (😊 Great, 🙂 Good, 😐 Okay, 😔 Struggling, 💪 Motivated)
+- **Photo Attachment**: Add single photo per day (workout proof, study notes, etc.)
+- **Weekly Reflection Prompt**: Special prompt appears every 7 days for deeper reflection
+- **Journal History**: Scrollable list of past entries with date, mood, and content preview
+- **Entry Preview Cards**: Show date, mood emoji, content snippet, and photo indicator
+
+**Key Features:**
+- Auto-save functionality (saves 1 second after typing stops)
+- Mood tracking with visual emoji selector
+- Photo attachment capability (placeholder for image picker)
+- Automatic weekly reflection prompts on day 7, 14, 21, etc.
+- Past entries displayed with formatted dates and mood
+- Purple-themed weekly reflection cards
+- Badge indicator for entries with weekly reflections
+- Empty state for new users
+- Persistent storage of all entries
+
 ## Getting Started
 
 ### Prerequisites
@@ -88,11 +107,13 @@ lib/
 ├── models/
 │   ├── arc_data.dart           # Arc data model with progress calculations
 │   ├── daily_progress.dart     # Daily goal tracking model
-│   └── progress_stats.dart     # Streak and stats tracking model
+│   ├── progress_stats.dart     # Streak and stats tracking model
+│   └── journal_entry.dart      # Journal entry model
 ├── pages/
 │   ├── arc_setup_page.dart     # Onboarding/setup page
 │   ├── home_dashboard.dart     # Main daily tracking dashboard
-│   └── progress_page.dart      # Progress tracking and analytics
+│   ├── progress_page.dart      # Progress tracking and analytics
+│   └── journal_page.dart       # Personal reflection and journaling
 └── utils/
     ├── storage_helper.dart     # Local storage utilities
     └── quotes_helper.dart      # Motivational quotes manager
@@ -117,13 +138,13 @@ lib/
 - [x] Arc Setup (Onboarding) Page
 - [x] Home Dashboard (Daily Tracking)
 - [x] Progress Tracking (Stats & Streaks)
+- [x] Journal (Reflections & Notes)
 - [ ] Task Planner
 - [ ] Study Tracker
 - [ ] Health & Fitness
-- [ ] Journal (Reflections & Notes)
 - [ ] Profile
 - [ ] Settings
 
 ## Next Steps
 
-Ready for the next page! Waiting for specifications for Journal, Task Planner, Study Tracker, Health & Fitness, or Profile pages.
+Ready for the next page! Waiting for specifications for Task Planner, Study Tracker, Health & Fitness, or Profile pages.
