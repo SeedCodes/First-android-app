@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import '../models/arc_data.dart';
 import '../models/daily_progress.dart';
+import '../models/progress_stats.dart';
 import '../utils/storage_helper.dart';
 import '../utils/quotes_helper.dart';
+import 'progress_page.dart';
 
 class HomeDashboard extends StatefulWidget {
   const HomeDashboard({super.key});
@@ -15,6 +17,7 @@ class HomeDashboard extends StatefulWidget {
 class _HomeDashboardState extends State<HomeDashboard> {
   ArcData? _arcData;
   DailyProgress? _dailyProgress;
+  ProgressStats? _progressStats;
   bool _isLoading = true;
   int _currentNavIndex = 0;
 
@@ -27,12 +30,17 @@ class _HomeDashboardState extends State<HomeDashboard> {
   Future<void> _loadData() async {
     final arcData = await StorageHelper.loadArcData();
     final dailyProgress = await StorageHelper.loadDailyProgress();
+    final progressStats = await StorageHelper.loadProgressStats();
 
     setState(() {
       _arcData = arcData;
       _dailyProgress = dailyProgress ?? DailyProgress.create(arcData?.goals ?? []);
+      _progressStats = progressStats ?? ProgressStats.create();
       _isLoading = false;
     });
+
+    // Check if all goals are completed and update stats
+    _checkDayCompletion();
   }
 
   Future<void> _toggleGoal(String goal) async {
@@ -43,6 +51,38 @@ class _HomeDashboardState extends State<HomeDashboard> {
     });
 
     await StorageHelper.saveDailyProgress(_dailyProgress!);
+    
+    // Check if day is now complete
+    _checkDayCompletion();
+  }
+
+  Future<void> _checkDayCompletion() async {
+    if (_dailyProgress == null || _progressStats == null) return;
+
+    // If all goals are completed for today
+    if (_dailyProgress!.isFullyCompleted()) {
+      final today = DateTime.now();
+      
+      // Mark today as completed if not already marked
+      if (!_progressStats!.isDateCompleted(today)) {
+        setState(() {
+          _progressStats = _progressStats!.markDateCompleted(today);
+        });
+        await StorageHelper.saveProgressStats(_progressStats!);
+        
+        // Show celebration
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('🎉 All goals completed! Day conquered!'),
+              backgroundColor: const Color(0xFF50C878),
+              behavior: SnackBarBehavior.floating,
+              duration: const Duration(seconds: 2),
+            ),
+          );
+        }
+      }
+    }
   }
 
   double _getOverallProgress() {
@@ -426,8 +466,20 @@ class _HomeDashboardState extends State<HomeDashboard> {
         setState(() {
           _currentNavIndex = index;
         });
-        // TODO: Navigate to respective pages
-        if (index != 0) {
+        
+        // Navigate to respective pages
+        if (index == 1) {
+          // Progress page
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const ProgressPage()),
+          ).then((_) {
+            // Reset selection when returning
+            setState(() {
+              _currentNavIndex = 0;
+            });
+          });
+        } else if (index != 0) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('$label page - Coming soon!'),

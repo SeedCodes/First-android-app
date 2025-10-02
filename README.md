@@ -37,6 +37,28 @@ A productivity and self-growth app built with Flutter to help users track their 
 - Smooth animations and transitions
 - Completion celebration with visual cues
 - Persistent daily progress storage
+- Automatic streak tracking when all goals completed
+
+#### 3. Progress Tracking (Stats & Analytics)
+- **Weekly Streak View**: Calendar-style view showing last 7 days with completion status
+- **Current Streak Display**: Fire icon with active streak count and best streak record
+- **Statistics Cards**:
+  - Success Rate percentage
+  - Days completed (X/Total)
+  - Missed days count
+  - Best streak record
+- **Arc Visualization**: Circular arc progress with percentage and linear timeline
+- **Milestone Messages**: Dynamic motivational messages at 25%, 50%, 75%, 100% completion
+- **Journey Timeline**: Week-by-week breakdown showing completed, missed, and upcoming days
+
+**Key Features:**
+- Automatic streak calculation based on completed days
+- Visual calendar showing check marks for completed days
+- Custom arc painter for progress visualization
+- Dynamic milestone detection and messaging
+- Color-coded timeline (green = completed, red = missed, gray = upcoming)
+- Success rate calculation
+- Complete journey overview with week rows
 
 ## Getting Started
 
@@ -65,10 +87,12 @@ lib/
 ├── main.dart                    # App entry point with routing logic
 ├── models/
 │   ├── arc_data.dart           # Arc data model with progress calculations
-│   └── daily_progress.dart     # Daily goal tracking model
+│   ├── daily_progress.dart     # Daily goal tracking model
+│   └── progress_stats.dart     # Streak and stats tracking model
 ├── pages/
 │   ├── arc_setup_page.dart     # Onboarding/setup page
-│   └── home_dashboard.dart     # Main daily tracking dashboard
+│   ├── home_dashboard.dart     # Main daily tracking dashboard
+│   └── progress_page.dart      # Progress tracking and analytics
 └── utils/
     ├── storage_helper.dart     # Local storage utilities
     └── quotes_helper.dart      # Motivational quotes manager
@@ -92,7 +116,7 @@ lib/
 
 - [x] Arc Setup (Onboarding) Page
 - [x] Home Dashboard (Daily Tracking)
-- [ ] Challenge Progress (Stats & Streaks)
+- [x] Progress Tracking (Stats & Streaks)
 - [ ] Task Planner
 - [ ] Study Tracker
 - [ ] Health & Fitness
@@ -102,4 +126,4 @@ lib/
 
 ## Next Steps
 
-Waiting for page specifications for Challenge Progress or other pages.
+Ready for the next page! Waiting for specifications for Journal, Task Planner, Study Tracker, Health & Fitness, or Profile pages.

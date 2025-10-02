@@ -2,10 +2,12 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/arc_data.dart';
 import '../models/daily_progress.dart';
+import '../models/progress_stats.dart';
 
 class StorageHelper {
   static const String _arcDataKey = 'arc_data';
   static const String _dailyProgressKey = 'daily_progress';
+  static const String _progressStatsKey = 'progress_stats';
 
   // Save arc data
   static Future<void> saveArcData(ArcData arcData) async {
@@ -70,5 +72,31 @@ class StorageHelper {
   static Future<void> clearDailyProgress() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_dailyProgressKey);
+  }
+
+  // Save progress stats
+  static Future<void> saveProgressStats(ProgressStats stats) async {
+    final prefs = await SharedPreferences.getInstance();
+    final jsonString = jsonEncode(stats.toJson());
+    await prefs.setString(_progressStatsKey, jsonString);
+  }
+
+  // Load progress stats
+  static Future<ProgressStats?> loadProgressStats() async {
+    final prefs = await SharedPreferences.getInstance();
+    final jsonString = prefs.getString(_progressStatsKey);
+    
+    if (jsonString == null) {
+      return null;
+    }
+
+    final jsonData = jsonDecode(jsonString) as Map<String, dynamic>;
+    return ProgressStats.fromJson(jsonData);
+  }
+
+  // Clear progress stats
+  static Future<void> clearProgressStats() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_progressStatsKey);
   }
 }
