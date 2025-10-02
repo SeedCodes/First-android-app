@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../models/arc_data.dart';
 import '../models/app_settings.dart';
 import '../utils/storage_helper.dart';
+import '../utils/notification_helper.dart';
+import '../utils/export_helper.dart';
+import '../providers/theme_provider.dart';
 import 'arc_setup_page.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -36,6 +40,11 @@ class _ProfilePageState extends State<ProfilePage> {
   Future<void> _saveSettings() async {
     if (_settings == null) return;
     await StorageHelper.saveAppSettings(_settings!);
+    
+    // Update notifications if enabled
+    if (_settings!.notificationsEnabled) {
+      await NotificationHelper.scheduleDailyReminder(_settings!);
+    }
   }
 
   void _editArcName() {
@@ -215,6 +224,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 _buildThemesSection(),
                 const SizedBox(height: 24),
                 _buildNotificationsSection(),
+                const SizedBox(height: 24),
+                _buildDataExportSection(),
                 const SizedBox(height: 24),
                 _buildAboutSection(),
                 const SizedBox(height: 20),
@@ -513,10 +524,10 @@ class _ProfilePageState extends State<ProfilePage> {
           _buildThemeOption('Warrior', 'Bold red & black theme', 2),
           const SizedBox(height: 8),
           const Text(
-            'Note: Theme switching coming soon!',
+            'Theme applies instantly across the app! ✨',
             style: TextStyle(
               fontSize: 12,
-              color: Colors.white38,
+              color: Color(0xFF50C878),
               fontStyle: FontStyle.italic,
             ),
           ),
@@ -534,10 +545,14 @@ class _ProfilePageState extends State<ProfilePage> {
           _settings = _settings!.copyWith(themeIndex: themeIndex);
         });
         _saveSettings();
+        
+        // Apply theme immediately
+        Provider.of<ThemeProvider>(context, listen: false).setTheme(themeIndex);
+        
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('$title theme selected (will apply in future update)'),
-            backgroundColor: const Color(0xFF4A90E2),
+            content: Text('$title theme applied! ✨'),
+            backgroundColor: const Color(0xFF50C878),
             behavior: SnackBarBehavior.floating,
             duration: const Duration(seconds: 2),
           ),
@@ -700,10 +715,10 @@ class _ProfilePageState extends State<ProfilePage> {
           ],
           const SizedBox(height: 12),
           const Text(
-            'Note: Notification system coming soon!',
+            'Notifications active! You\'ll get daily reminders. 🔔',
             style: TextStyle(
               fontSize: 12,
-              color: Colors.white38,
+              color: Color(0xFF50C878),
               fontStyle: FontStyle.italic,
             ),
           ),
@@ -745,7 +760,43 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
         Switch(
           value: value,
-          onChanged: onChanged,
+          onChanged: (newValue) async {
+            onChanged(newValue);
+            
+            // Request permission and schedule notifications
+            if (newValue) {
+              final hasPermission = await NotificationHelper.requestPermission();
+              if (hasPermission) {
+                await NotificationHelper.scheduleDailyReminder(_settings!);
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Daily reminders enabled! 🔔'),
+                      backgroundColor: Color(0xFF50C878),
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                }
+              } else {
+                // Permission denied
+                setState(() {
+                  _settings = _settings!.copyWith(notificationsEnabled: false);
+                });
+                _saveSettings();
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Notification permission required'),
+                      backgroundColor: Color(0xFFE74C3C),
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                }
+              }
+            } else {
+              await NotificationHelper.cancelAll();
+            }
+          },
           activeColor: const Color(0xFF50C878),
         ),
       ],
@@ -803,6 +854,188 @@ class _ProfilePageState extends State<ProfilePage> {
                 color: Color(0xFF50C878),
                 size: 20,
               ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDataExportSection() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1D1E33),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFF6B35).withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.cloud_upload,
+                  color: Color(0xFFFF6B35),
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 12),
+              const Text(
+                'Export Data',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          _buildExportOption(
+            Icons.backup,
+            'Full Backup',
+            'Export all data as JSON',
+            () async {
+              try {
+                await ExportHelper.exportAllData();
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Data exported successfully! 📦'),
+                      backgroundColor: Color(0xFF50C878),
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                }
+              } catch (e) {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Export failed: $e'),
+                      backgroundColor: const Color(0xFFE74C3C),
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                }
+              }
+            },
+          ),
+          const SizedBox(height: 12),
+          _buildExportOption(
+            Icons.summarize,
+            'Summary Report',
+            'Export readable summary',
+            () async {
+              try {
+                await ExportHelper.exportSummary();
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Summary exported! 📊'),
+                      backgroundColor: Color(0xFF50C878),
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                }
+              } catch (e) {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Export failed: $e'),
+                      backgroundColor: const Color(0xFFE74C3C),
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                }
+              }
+            },
+          ),
+          const SizedBox(height: 12),
+          _buildExportOption(
+            Icons.menu_book,
+            'Journal Export',
+            'Export all journal entries',
+            () async {
+              try {
+                await ExportHelper.exportJournal();
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Journal exported! 📔'),
+                      backgroundColor: Color(0xFF50C878),
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                }
+              } catch (e) {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Export failed: $e'),
+                      backgroundColor: const Color(0xFFE74C3C),
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                }
+              }
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildExportOption(
+    IconData icon,
+    String title,
+    String description,
+    VoidCallback onTap,
+  ) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: const Color(0xFF0A0E21),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: const Color(0xFFFF6B35), size: 24),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    description,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Colors.white54,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(
+              Icons.chevron_right,
+              color: Colors.white54,
+              size: 20,
+            ),
           ],
         ),
       ),

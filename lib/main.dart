@@ -1,10 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:timezone/data/latest_all.dart' as tz;
 import 'pages/arc_setup_page.dart';
 import 'pages/home_dashboard.dart';
 import 'utils/storage_helper.dart';
+import 'utils/notification_helper.dart';
+import 'providers/theme_provider.dart';
 
-void main() {
-  runApp(const WinterArcApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize timezones for notifications
+  tz.initializeTimeZones();
+  
+  // Initialize notifications
+  await NotificationHelper.initialize();
+  
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => ThemeProvider(),
+      child: const WinterArcApp(),
+    ),
+  );
 }
 
 class WinterArcApp extends StatelessWidget {
@@ -12,30 +29,15 @@ class WinterArcApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'The Winter Arc',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        scaffoldBackgroundColor: const Color(0xFF0A0E21),
-        colorScheme: ColorScheme.dark(
-          primary: const Color(0xFF4A90E2),
-          secondary: const Color(0xFF50C878),
-          surface: const Color(0xFF1D1E33),
-        ),
-        textTheme: const TextTheme(
-          headlineLarge: TextStyle(
-            fontSize: 32,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-          bodyLarge: TextStyle(
-            fontSize: 16,
-            color: Colors.white70,
-          ),
-        ),
-      ),
-      home: const AppInitializer(),
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, child) {
+        return MaterialApp(
+          title: 'The Winter Arc',
+          debugShowCheckedModeBanner: false,
+          theme: themeProvider.getThemeData(),
+          home: const AppInitializer(),
+        );
+      },
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
+import 'package:image_picker/image_picker.dart';
 import '../models/journal_entry.dart';
 import '../models/arc_data.dart';
 import '../utils/storage_helper.dart';
@@ -149,27 +150,73 @@ class _JournalPageState extends State<JournalPage> {
   }
 
   Future<void> _addPhoto() async {
-    // In a real app, this would open image picker
-    // For now, we'll show a placeholder message
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Photo picker would open here (requires image_picker package)'),
-        backgroundColor: Color(0xFF4A90E2),
-        behavior: SnackBarBehavior.floating,
-        duration: Duration(seconds: 2),
-      ),
-    );
-    
-    // Placeholder: Simulate adding a photo
-    // In production, use image_picker package:
-    // final picker = ImagePicker();
-    // final image = await picker.pickImage(source: ImageSource.gallery);
-    // if (image != null) {
-    //   setState(() {
-    //     _photoPath = image.path;
-    //   });
-    //   _saveEntry();
-    // }
+    try {
+      final picker = ImagePicker();
+      
+      // Show option to choose camera or gallery
+      final source = await showDialog<ImageSource>(
+        context: context,
+        builder: (context) => AlertDialog(
+          backgroundColor: const Color(0xFF1D1E33),
+          title: const Text(
+            'Add Photo',
+            style: TextStyle(color: Colors.white),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.camera_alt, color: Color(0xFF4A90E2)),
+                title: const Text('Camera', style: TextStyle(color: Colors.white)),
+                onTap: () => Navigator.pop(context, ImageSource.camera),
+              ),
+              ListTile(
+                leading: const Icon(Icons.photo_library, color: Color(0xFF50C878)),
+                title: const Text('Gallery', style: TextStyle(color: Colors.white)),
+                onTap: () => Navigator.pop(context, ImageSource.gallery),
+              ),
+            ],
+          ),
+        ),
+      );
+
+      if (source == null) return;
+
+      final image = await picker.pickImage(
+        source: source,
+        maxWidth: 1920,
+        maxHeight: 1080,
+        imageQuality: 85,
+      );
+
+      if (image != null) {
+        setState(() {
+          _photoPath = image.path;
+        });
+        _saveEntry();
+        
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Photo added! 📸'),
+              backgroundColor: Color(0xFF50C878),
+              behavior: SnackBarBehavior.floating,
+              duration: Duration(seconds: 1),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to add photo'),
+            backgroundColor: Color(0xFFE74C3C),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
   }
 
   void _removePhoto() {
@@ -467,31 +514,32 @@ class _JournalPageState extends State<JournalPage> {
                     width: double.infinity,
                     height: 200,
                     color: const Color(0xFF0A0E21),
-                    child: const Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.image,
-                            size: 64,
-                            color: Color(0xFF4A90E2),
+                    child: Image.file(
+                      File(_photoPath!),
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return const Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.broken_image,
+                                size: 64,
+                                color: Colors.white38,
+                              ),
+                              SizedBox(height: 8),
+                              Text(
+                                'Failed to load image',
+                                style: TextStyle(
+                                  color: Colors.white54,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
                           ),
-                          SizedBox(height: 8),
-                          Text(
-                            'Photo Preview',
-                            style: TextStyle(
-                              color: Colors.white54,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ],
-                      ),
+                        );
+                      },
                     ),
-                    // In production with real photos:
-                    // child: Image.file(
-                    //   File(_photoPath!),
-                    //   fit: BoxFit.cover,
-                    // ),
                   ),
                 ),
                 Positioned(
